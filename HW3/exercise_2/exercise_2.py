@@ -179,10 +179,10 @@ if __name__ == '__main__':
   try:
     members = int(sys.argv[1])
     graph = Graph(FILE_PATH)
-    tree = graph.girvan_newman(True)
+    tree = graph.girvan_newman(False)
     communities = tree.get_community(tree.root, members)
-    tree.preorder(tree.root)
-    # print(communities)
+    # tree.preorder(tree.root)
+    print(communities)
     # graph.preorder(copy.copy(graph.root))
   except:
     print('python3 <EXECUTABLE> <MEMBERS>')
