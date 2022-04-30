@@ -7,7 +7,10 @@ import csv
 import networkx as nx
 import copy
 import sys
+import numpy as np
 from networkx.algorithms.community import greedy_modularity_communities
+from community import community_louvain
+from matplotlib import cm
 
 
 FILE_PATH = 'dataset.html'
@@ -28,6 +31,42 @@ class Graph:
     self._add_edges()
     self._networkx_graph_init()
 
+  def visualize_graph(self):
+    position = nx.spring_layout(self.networkx_graph)
+    nx.draw(self.networkx_graph, position, node_size = 75, alpha = 0.8)
+    plt.show()
+  
+  def visualize_communities(self, communities):
+    unique_coms = np.unique(list(communities.values()))
+    cmap = cm.get_cmap('viridis', max(communities.values()) + 1)
+
+    position = nx.spring_layout(self.networkx_graph)
+    
+    nx.draw_networkx_nodes(self.networkx_graph, position, communities.keys(), node_size=60, cmap=cmap, node_color=list(communities.values()))
+    nx.draw_networkx_edges(self.networkx_graph, position, alpha=0.8)
+    
+    labels = {}    
+    i = 0
+    for node in self.networkx_graph.nodes():
+      #set the node name as the key and the label as its value 
+      labels[node] = i
+      i = i + 1
+    
+    pos_higher = {}
+    y_off = 0.08 
+    for k, v in position.items():
+      pos_higher[k] = (v[0], v[1]+y_off) 
+    
+    nx.draw_networkx_labels(self.networkx_graph, pos_higher, labels, font_size=10,font_color='r')
+    plt.show()
+    
+    
+    # nx.draw(self.networkx_graph, pos, node_size = 75, alpha = 0.8, node_color=node_cmap)
+    # plt.show()
+  
+  
+  def louvain(self):
+    return community_louvain.best_partition(self.networkx_graph)
 
   def modularity_communities(self):
     return greedy_modularity_communities(self.networkx_graph)
@@ -87,7 +126,7 @@ class Graph:
 
 if __name__ == '__main__':
   graph = Graph(FILE_PATH)
-  communities = graph.modularity_communities()  
-  for community in communities:
-    print(sorted(community))
+  graph.visualize_graph()
+  communities = graph.modularity_communities()
+  graph.visualize_communities(graph.louvain())
   
